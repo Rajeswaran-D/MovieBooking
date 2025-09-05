@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Your Seats</title>
+  <style>
+    body {
+      background: #1a1a1a;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    h2 { margin: 20px 0; }
+    .screen {
+      background: #fff;
+      color: black;
+      margin: 20px auto;
+      width: 80%;
+      padding: 10px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .seats {
+      display: grid;
+      grid-template-columns: repeat(8, 40px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px;
+    }
+    .seat {
+      width: 40px;
+      height: 40px;
+      background: gray;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: black;
+      font-weight: bold;
+    }
+    .seat.selected { background: limegreen; }
+    .seat.occupied { background: red; cursor: not-allowed; }
+    .legend { margin-top: 20px; }
+    .legend span {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    button.confirm {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: gold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button.confirm:hover { background: orange; }
+
+    /* Receipt popup */
+    .receipt {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      color: black;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+      text-align: left;
+      box-shadow: 0 0 15px rgba(0,0,0,0.6);
+    }
+    .receipt h3 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .receipt button {
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 16px;
+      background: crimson;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .receipt button:hover { background: darkred; }
+  </style>
+</head>
+<body>
+  <h2>Select Your Seats</h2>
+  <div class="screen">SCREEN</div>
+  
+  <div class="seats" id="seats-container"></div>
+
+  <div class="legend">
+    <span style="background: gray;"></span> Available
+    <span style="background: limegreen;"></span> Selected
+    <span style="background: red;"></span> Occupied
+  </div>
+
+  <button class="confirm">Confirm Booking</button>
+
+  <!-- Receipt Popup -->
+  <div class="receipt" id="receipt">
+    <h3>🎟 Booking Receipt</h3>
+    <p><strong>Seats:</strong> <span id="receipt-seats"></span></p>
+    <p><strong>Price per ticket:</strong> ₹150</p>
+    <p><strong>Total:</strong> ₹<span id="receipt-total"></span></p>
+    <p><strong>Show Time:</strong> 6:30 PM</p>
+    <button onclick="closeReceipt()">Close</button>
+  </div>
+
+  <script>
+    const seatsContainer = document.getElementById("seats-container");
+    const rows = 5, cols = 8;
+    let seatPrice = 150;
+
+    // Generate seats dynamically with labels
+    for (let r = 0; r < rows; r++) {
+      for (let c = 1; c <= cols; c++) {
+        const seat = document.createElement("div");
+        seat.classList.add("seat");
+        seat.innerText = String.fromCharCode(65 + r) + c; // A1, A2...
+        if (Math.random() < 0.1) seat.classList.add("occupied"); // Random occupied
+        seatsContainer.appendChild(seat);
+      }
+    }
+
+    // Seat selection
+    const seats = document.querySelectorAll(".seat:not(.occupied)");
+    seats.forEach(seat => {
+      seat.addEventListener("click", () => {
+        seat.classList.toggle("selected");
+      });
+    });
+
+    // Confirm booking
+    document.querySelector(".confirm").addEventListener("click", () => {
+      const selectedSeats = document.querySelectorAll(".seat.selected");
+      if (selectedSeats.length === 0) {
+        alert("Please select at least one seat.");
+        return;
+      }
+
+      let seatNames = [];
+      selectedSeats.forEach(seat => seatNames.push(seat.innerText));
+
+      document.getElementById("receipt-seats").innerText = seatNames.join(", ");
+      document.getElementById("receipt-total").innerText = seatNames.length * seatPrice;
+
+      document.getElementById("receipt").style.display = "block";
+    });
+
+    // Close receipt
+    function closeReceipt() {
+      document.getElementById("receipt").style.display = "none";
+    }
+  </script>
+</body>
+</html>
